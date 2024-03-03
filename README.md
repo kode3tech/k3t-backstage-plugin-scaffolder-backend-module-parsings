@@ -7,6 +7,22 @@ This package make you able to parse and extract from `Yaml`, `Xml` and `Json` fo
 _This plugin was created through the Backstage CLI_
 
 
+## Features
+
+* Parse `Json` from `raw`, `base64`, `file` and `url` sources.
+* Get `Json` results from multiple queries with `Json Path-plus`.
+* Parse and transform `Yaml` and `Xml` files to `Json`.
+
+## Available actions
+
+* `json`
+* `json:path`
+* `xml`
+* `yaml`
+
+
+
+
 ## Get Started
 
 on `packages/backend/src/plugins/scaffolder.ts`
@@ -55,3 +71,4 @@ export default async function createPlugin(
   });
 
 ```
+
