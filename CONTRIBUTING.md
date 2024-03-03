@@ -5,6 +5,16 @@
 git submodule add git@github.com:kode3tech/k3t-backstage-plugin-scaffolder-backend-module-parsings.git plugins/scaffolder-backend-module-parsings
 ```
 
+
+`packages/backend/package.json`
+
+```json
+  "dependencies": {
+    ...
+    "@k3tech/backstage-plugin-scaffolder-backend-module-parsings": "link:../../plugins/scaffolder-backend-module-parsings",
+  }
+```
+
 ## Publishing
 
 ```sh
