@@ -1,3 +1,12 @@
+
+## Fast Development
+
+```sh
+git submodule add git@github.com:kode3tech/k3t-backstage-plugin-scaffolder-backend-module-parsings.git plugins/scaffolder-backend-module-parsings
+```
+
+## Publishing
+
 ```sh
 
 yarn login
