@@ -59,7 +59,7 @@ export const OutputSchema: Schema = {
       type: "array",
       items: { 
         type: "array"
-       },
+      },
     }
   }
 }
