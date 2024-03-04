@@ -1,11 +1,8 @@
-# @k3tech/backstage-plugin-scaffolder-backend-module-parsings
+# Plugin for scaffolder backend `parsings`
 
 The parsings module for [@backstage/plugin-scaffolder-backend](https://www.npmjs.com/package/@backstage/plugin-scaffolder-backend).
 
 This package make you able to parse and extract from `Yaml`, `Xml` and `Json` formats.
-
-_This plugin was created through the Backstage CLI_
-
 
 ## Features
 
@@ -13,15 +10,7 @@ _This plugin was created through the Backstage CLI_
 * Get `Json` results from multiple queries with `Json Path-plus`.
 * Parse and transform `Yaml` and `Xml` files to `Json`.
 
-## Available actions
-
-* `json`
-* `json:path`
-* `xml`
-* `yaml`
-
-
-
+> You can see all available examples [here](./exemples.md).
 
 ## Get Started
 
@@ -72,3 +61,4 @@ export default async function createPlugin(
 
 ```
 
+_This plugin was created through the Backstage CLI_
