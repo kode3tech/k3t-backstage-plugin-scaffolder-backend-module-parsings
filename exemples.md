@@ -13,24 +13,6 @@ steps:
 
 ```
 
-### Parse multiple Yamls contents from various sources types.
-
-```yaml
-steps:
-  - action: yaml
-    id: yaml-parse
-    name: Parse yaml files
-    input:
-      commonParams:
-        encoding: raw
-      sources:
-        - content: |
-            key: value
-        - content: |
-            anotherkey: another value
-
-```
-
 ### Parse multiple Json contents from various sources types.
 
 ```yaml
@@ -69,5 +51,23 @@ steps:
         encoding: raw
       sources:
         - content: '{"key":"value"}'
+
+```
+
+### Parse multiple Yamls contents from various sources types.
+
+```yaml
+steps:
+  - action: yaml
+    id: yaml-parse
+    name: Parse yaml files
+    input:
+      commonParams:
+        encoding: raw
+      sources:
+        - content: |
+            key: value
+        - content: |
+            anotherkey: another value
 
 ```
