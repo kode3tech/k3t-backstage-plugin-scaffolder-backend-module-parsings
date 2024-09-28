@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.29](https://github.com/kode3tech/k3t-backstage-plugin-scaffolder-backend-module-parsings/compare/v0.2.28...v0.2.29) (2024-09-28)
+
 ### [0.2.28](https://github.com/kode3tech/k3t-backstage-plugin-scaffolder-backend-module-parsings/compare/v0.2.27...v0.2.28) (2024-09-28)
 
 
