@@ -11,6 +11,7 @@ import yaml from 'yaml';
 import { JSON_PATH_ID } from './ids';
 import { createJsonPathAction } from './json-path';
 import { examples } from './json-path.examples';
+import { ActionContext } from '@backstage/plugin-scaffolder-node';
 
 describe(`${JSON_PATH_ID} examples`, () => {
   beforeEach(() => {
@@ -18,7 +19,10 @@ describe(`${JSON_PATH_ID} examples`, () => {
   });
 
   const action = createJsonPathAction();
-  const mockContext = {
+  const mockContext: ActionContext<any, any> = {
+    input: {},
+    checkpoint: jest.fn(),
+    getInitiatorCredentials: jest.fn(),
     workspacePath: os.tmpdir(),
     logger: getVoidLogger(),
     logStream: new PassThrough(),

@@ -6,12 +6,14 @@ jest.mock('@backstage/plugin-scaffolder-node', () => {
 
 import yaml from 'yaml';
 import os from 'os';
-import { getVoidLogger, UrlReader } from '@backstage/backend-common';
+import { getVoidLogger } from '@backstage/backend-common';
 import { ConfigReader } from '@backstage/config';
 import { ScmIntegrations } from '@backstage/integration';
 import { createYamlParseAction } from './yaml';
 import { PassThrough } from 'stream';
 import { examples } from './yaml.examples';
+import { UrlReaderService } from '@backstage/backend-plugin-api';
+import { ActionContext } from '@backstage/plugin-scaffolder-node';
 
 describe('json:parse examples', () => {
   const integrations = ScmIntegrations.fromConfig(
@@ -21,7 +23,7 @@ describe('json:parse examples', () => {
       },
     }),
   );
-  const reader: UrlReader = {
+  const reader: UrlReaderService = {
     readUrl: jest.fn(),
     readTree: jest.fn(),
     search: jest.fn(),
@@ -32,7 +34,10 @@ describe('json:parse examples', () => {
   });
 
   const action = createYamlParseAction({ integrations, reader });
-  const mockContext = {
+  const mockContext: ActionContext<any, any> = {
+    input: {},
+    checkpoint: jest.fn(),
+    getInitiatorCredentials: jest.fn(),
     workspacePath: os.tmpdir(),
     logger: getVoidLogger(),
     logStream: new PassThrough(),

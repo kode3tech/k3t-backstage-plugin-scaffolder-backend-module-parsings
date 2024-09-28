@@ -84,7 +84,7 @@ export function createJsonPathAction() {
     },
     async handler(ctx) {
       const { input: { queries, commonParams }, logger, output } = ctx;
-      const results = []
+      const results: any[] = []
       
       for (const query of queries) {
         const { json, options, path } =  {

@@ -12,11 +12,14 @@
     "types": "dist/index.d.ts"
   },
   "backstage": {
-    "role": "backend-plugin-module"
+    "role": "backend-plugin-module",
+    "pluginId": "scaffolder",
+    "pluginPackage": "@backstage/plugin-scaffolder-backend"
   },
   "repository": {
     "type": "git",
-    "url": "git+http://github.com/kode3tech/k3t-backstage-plugin-scaffolder-backend-module-parsings.git"
+    "url": "git+http://github.com/kode3tech/k3t-backstage-plugin-scaffolder-backend-module-parsings.git",
+    "directory": "."
   },
   "bugs": {
     "url": "https://github.com/kode3tech/k3t-backstage-plugin-scaffolder-backend-module-parsings/issues"
@@ -36,32 +39,38 @@
     "postpack": "backstage-cli package postpack"
   },
   "dependencies": {
-    "@backstage/plugin-scaffolder-backend": "^1.19.0",
-    "xml-js": "^1.6.11"
+    "@backstage/backend-defaults": "^0.5.0",
+    "@backstage/backend-plugin-api": "^1.0.0",
+    "@backstage/plugin-scaffolder-backend": "^1.25.0",
+    "@backstage/plugin-scaffolder-node": "^0.4.11",
+    "xml-js": "^1.6.11",
+    "yaml": "^2.5.1",
+    "jsonpath-plus": "^9.0.0",
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {
+    "@backstage/backend-test-utils": "0.5.1",
+    "@backstage/cli": "0.27.0",
+    "@backstage/test-utils": "^1.6.0",
     "@types/js-yaml": "4.0.9",
     "@types/fs-extra": "11.0.4",
-    "@backstage/cli": "^0.24.0",
-    "@backstage/backend-test-utils": "^0.2.8",
     "standard-version": "^9.5.0",
     "ts-node": "10.9.2"
   },
   "peerDependencies": {
-    "@backstage/backend-common": "*",
-    "@backstage/catalog-client": "*",
-    "@backstage/catalog-model": "*",
-    "@backstage/integration": "*",
-    "@backstage/plugin-scaffolder-node": "*",
-    "@backstage/config": "*",
-    "@backstage/types": "*",
-    "yaml": "*",
-    "zod": "*",
-    "fs-extra": "*",
-    "jsonschema": "*",
-    "jsonpath-plus": "*",
-    "js-yaml": "*",
-    "globby": "*"
+    "@backstage/backend-common": "^0.25.0",
+    "@backstage/backend-plugin-api": "^1.0.0",
+    "@backstage/catalog-client": "^1.7.0",
+    "@backstage/catalog-model": "^1.7.0",
+    "@backstage/config": "^1.2.0",
+    "@backstage/errors": "^1.2.4",
+    "@backstage/integration": "^1.15.0",
+    "@backstage/plugin-scaffolder-node": "^0.4.11",
+    "@backstage/types": "^1.1.1",
+    "zod": "^3.23.8",
+    "fs-extra": "^11.2.0",
+    "jsonschema": "^1.4.1",
+    "globby": "^14.0.2"
   },
   "files": [
     "dist"

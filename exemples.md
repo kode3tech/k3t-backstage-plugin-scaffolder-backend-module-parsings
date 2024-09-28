@@ -1,43 +1,4 @@
 
-## xml
-
-### Parse multiple Xmls contents from various sources types.
-
-```yaml
-steps:
-  - action: xml
-    id: xml-parse
-    name: Parse xml files
-    input:
-      commonParams:
-        encoding: raw
-      sources:
-        - content: <books><book>nature calls</book></books>
-
-```
-
-
-## yaml
-
-### Parse multiple Yamls contents from various sources types.
-
-```yaml
-steps:
-  - action: yaml
-    id: yaml-parse
-    name: Parse yaml files
-    input:
-      commonParams:
-        encoding: raw
-      sources:
-        - content: |
-            key: value
-        - content: |
-            anotherkey: another value
-
-```
-
-
 ## json:path
 
 ### Evaluate multiple queries from same JSON.
@@ -110,5 +71,44 @@ steps:
         encoding: raw
       sources:
         - content: '{"key":"value"}'
+
+```
+
+
+## xml
+
+### Parse multiple Xmls contents from various sources types.
+
+```yaml
+steps:
+  - action: xml
+    id: xml-parse
+    name: Parse xml files
+    input:
+      commonParams:
+        encoding: raw
+      sources:
+        - content: <books><book>nature calls</book></books>
+
+```
+
+
+## yaml
+
+### Parse multiple Yamls contents from various sources types.
+
+```yaml
+steps:
+  - action: yaml
+    id: yaml-parse
+    name: Parse yaml files
+    input:
+      commonParams:
+        encoding: raw
+      sources:
+        - content: |
+            key: value
+        - content: |
+            anotherkey: another value
 
 ```

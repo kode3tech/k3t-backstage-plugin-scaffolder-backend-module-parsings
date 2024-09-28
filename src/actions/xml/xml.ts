@@ -1,4 +1,3 @@
-import { UrlReader } from '@backstage/backend-common';
 import { ScmIntegrations } from '@backstage/integration';
 import { ActionContext, createTemplateAction } from '@backstage/plugin-scaffolder-node';
 import { JsonObject } from '@backstage/types';
@@ -7,6 +6,7 @@ import xmljs from 'xml-js';
 import { ContentType, resolvers } from '../utils/content';
 import { XML_ID } from './ids';
 import { examples } from "./xml.examples";
+import { UrlReaderService } from '@backstage/backend-plugin-api';
 
 interface PipesFnMap {
   upper(value?: string): string
@@ -209,7 +209,7 @@ export const OutputSchema: Schema = {
 }
 
 export function createXmlParseAction({reader, integrations}: {
-  reader: UrlReader;
+  reader: UrlReaderService;
   integrations: ScmIntegrations;
 }) {
   

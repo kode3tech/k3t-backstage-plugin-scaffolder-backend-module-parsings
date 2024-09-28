@@ -6,13 +6,14 @@ jest.mock('@backstage/plugin-scaffolder-node', () => {
 
 import os from 'os';
 import { resolve as resolvePath } from 'path';
-import { getVoidLogger, UrlReader } from '@backstage/backend-common';
+import { getVoidLogger } from '@backstage/backend-common';
 import { ConfigReader } from '@backstage/config';
 import { ScmIntegrations } from '@backstage/integration';
-import { fetchFile } from '@backstage/plugin-scaffolder-node';
+import { ActionContext, fetchFile } from '@backstage/plugin-scaffolder-node';
 import { createXmlParseAction } from './xml';
 import { PassThrough } from 'stream';
 import { XML_ID } from './ids';
+import { UrlReaderService } from '@backstage/backend-plugin-api';
 
 describe(`${XML_ID}`, () => {
   const integrations = ScmIntegrations.fromConfig(
@@ -22,7 +23,7 @@ describe(`${XML_ID}`, () => {
       },
     }),
   );
-  const reader: UrlReader = {
+  const reader: UrlReaderService = {
     readUrl: jest.fn(),
     readTree: jest.fn(),
     search: jest.fn(),
@@ -33,7 +34,10 @@ describe(`${XML_ID}`, () => {
   });
 
   const action = createXmlParseAction({ integrations, reader });
-  const mockContext = {
+  const mockContext: ActionContext<any, any> = {
+    input: {},
+    checkpoint: jest.fn(),
+    getInitiatorCredentials: jest.fn(),
     workspacePath: os.tmpdir(),
     logger: getVoidLogger(),
     logStream: new PassThrough(),

@@ -1,5 +1,4 @@
 
-import { UrlReader } from '@backstage/backend-common';
 import { ScmIntegrations } from '@backstage/integration';
 import {
   ActionContext,
@@ -10,6 +9,7 @@ import { Schema } from 'jsonschema';
 import { AvailableTypes, ContentType, resolvers } from '../utils/content';
 import { JSON_ID } from './ids';
 import { examples } from './json.examples';
+import { UrlReaderService } from '@backstage/backend-plugin-api';
 
 export type FieldsType = {
   content: string;
@@ -74,7 +74,7 @@ export const OutputSchema: Schema = {
  * @public
  */
 export function createJsonParseAction({reader, integrations}: {
-  reader: UrlReader;
+  reader: UrlReaderService;
   integrations: ScmIntegrations;
 }) {
 
@@ -89,7 +89,7 @@ export function createJsonParseAction({reader, integrations}: {
     supportsDryRun: true,
     async handler(ctx) {
       const { input: { sources, commonParams }, logger, output } = ctx;
-      const results = []
+      const results: any[] = []
       
       for (const source of sources) {
         const { content, encoding } =  {

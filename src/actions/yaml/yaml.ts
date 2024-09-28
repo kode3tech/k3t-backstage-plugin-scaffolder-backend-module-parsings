@@ -3,10 +3,10 @@ import { loadAll } from "js-yaml";
 import { AvailableTypes, ContentType, resolvers } from '../utils/content';
 import { JsonObject } from '@backstage/types';
 import { Schema } from 'jsonschema';
-import { UrlReader } from '@backstage/backend-common';
 import { ScmIntegrations } from '@backstage/integration';
 import { YAML_ID } from './ids';
 import { examples } from "./yaml.examples";
+import { UrlReaderService } from '@backstage/backend-plugin-api';
 
 export type FieldsType = {
   content: string;
@@ -65,7 +65,7 @@ export const OutputSchema: Schema = {
 }
 
 export function createYamlParseAction({reader, integrations}: {
-  reader: UrlReader;
+  reader: UrlReaderService;
   integrations: ScmIntegrations;
 }) {
   

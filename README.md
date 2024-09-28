@@ -14,51 +14,21 @@ This package make you able to parse and extract from `Yaml`, `Xml` and `Json` fo
 
 ## Get Started
 
-on `packages/backend/src/plugins/scaffolder.ts`
+just 
+```bash
+yarn add @k3tech/backstage-plugin-scaffolder-backend-module-parsings
+```
+and import module on backend
 
+`packages/backend/src/index.ts`
 ```ts
-import { createParsingsActions } from "@k3tech/backstage-plugin-scaffolder-backend-module-parsings";
 ...
-
-export default async function createPlugin(
-  env: PluginEnvironment,
-): Promise<Router> {
-  const { 
-    config,
-    discovery,
-    logger,
-    database,
-    reader,
-    identity,
-   } = env
-  const catalogClient = new CatalogClient({
-    discoveryApi: discovery,
-  });
-  const integrations = ScmIntegrations.fromConfig(config);
-
-  const options = {
-    config,
-    discovery,
-    logger,
-    database,
-    reader,
-    identity,
-    catalogClient,
-    integrations
-  }
-
-  ...
-
-  const parsingsActions = createParsingsActions(options);
-
-  return await createRouter({
-    ...options,
-    actions: [
-      ...
-      ...parsingsActions,
-    ]
-  });
+backend.add(import('@k3tech/backstage-plugin-scaffolder-backend-module-parsings'));
 
 ```
+
+you can check if all actions and examples in is ready on http://localhost:3000/create/actions
+
+
 
 _This plugin was created through the Backstage CLI_
