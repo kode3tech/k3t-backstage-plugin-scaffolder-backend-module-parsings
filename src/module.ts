@@ -15,7 +15,7 @@ import {
  * A backend module that registers the action into the scaffolder
  */
 export const scaffolderCatalogModule = createBackendModule({
-  moduleId: 'k3tech:scaffolder-actions-plus',
+  moduleId: 'k3tech:scaffolder-actions-parsings',
   pluginId: 'scaffolder',
   register({ registerInit }) {
     registerInit({
