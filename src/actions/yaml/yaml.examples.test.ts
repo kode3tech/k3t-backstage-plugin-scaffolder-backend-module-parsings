@@ -1,27 +1,23 @@
-
-jest.mock('@backstage/plugin-scaffolder-node', () => {
-  const actual = jest.requireActual('@backstage/plugin-scaffolder-node');
+jest.mock("@backstage/plugin-scaffolder-node", () => {
+  const actual = jest.requireActual("@backstage/plugin-scaffolder-node");
   return { ...actual, fetchFile: jest.fn() };
 });
 
-import yaml from 'yaml';
-import os from 'os';
-import { getVoidLogger } from '@backstage/backend-common';
-import { ConfigReader } from '@backstage/config';
-import { ScmIntegrations } from '@backstage/integration';
-import { createYamlParseAction } from './yaml';
-import { PassThrough } from 'stream';
-import { examples } from './yaml.examples';
-import { UrlReaderService } from '@backstage/backend-plugin-api';
-import { ActionContext } from '@backstage/plugin-scaffolder-node';
+import yaml from "yaml";
+import { ConfigReader } from "@backstage/config";
+import { ScmIntegrations } from "@backstage/integration";
+import { createYamlParseAction, InputType, OutputType } from "./yaml";
+import { examples } from "./yaml.examples";
+import { UrlReaderService } from "@backstage/backend-plugin-api";
+import { createMockActionContext } from "@backstage/plugin-scaffolder-node-test-utils";
 
-describe('json:parse examples', () => {
+describe("json:parse examples", () => {
   const integrations = ScmIntegrations.fromConfig(
     new ConfigReader({
       integrations: {
-        github: [{ host: 'github.com', token: 'token' }],
+        github: [{ host: "github.com", token: "token" }],
       },
-    }),
+    })
   );
   const reader: UrlReaderService = {
     readUrl: jest.fn(),
@@ -34,31 +30,19 @@ describe('json:parse examples', () => {
   });
 
   const action = createYamlParseAction({ integrations, reader });
-  const mockContext: ActionContext<any, any> = {
-    input: {},
-    checkpoint: jest.fn(),
-    getInitiatorCredentials: jest.fn(),
-    workspacePath: os.tmpdir(),
-    logger: getVoidLogger(),
-    logStream: new PassThrough(),
-    output: jest.fn(),
-    createTemporaryDirectory: jest.fn(),
-  };
 
-  it('should parse object', async () => {
-    const parsedExemple = yaml.parse(examples[0].example)
-    await action.handler({
-      ...mockContext,
+  it("should parse object", async () => {
+    const parsedExemple = yaml.parse(examples[0].example);
+    const context = createMockActionContext<InputType, OutputType>({
       input: parsedExemple.steps[0].input,
     });
+
+    await action.handler(context);
     const result = [
       [yaml.parse(parsedExemple.steps[0].input.sources[0].content)],
-      [yaml.parse(parsedExemple.steps[0].input.sources[1].content)]
+      [yaml.parse(parsedExemple.steps[0].input.sources[1].content)],
     ];
 
-    expect(mockContext.output).toHaveBeenCalledWith(
-      'results',
-      result
-    );
+    expect(context.output).toHaveBeenCalledWith("results", result);
   });
 });
