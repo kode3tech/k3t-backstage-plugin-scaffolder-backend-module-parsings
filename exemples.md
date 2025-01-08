@@ -75,24 +75,6 @@ steps:
 ```
 
 
-## xml
-
-### Parse multiple Xmls contents from various sources types.
-
-```yaml
-steps:
-  - action: xml
-    id: xml-parse
-    name: Parse xml files
-    input:
-      commonParams:
-        encoding: raw
-      sources:
-        - content: <books><book>nature calls</book></books>
-
-```
-
-
 ## yaml
 
 ### Parse multiple Yamls contents from various sources types.
@@ -110,5 +92,23 @@ steps:
             key: value
         - content: |
             anotherkey: another value
+
+```
+
+
+## xml
+
+### Parse multiple Xmls contents from various sources types.
+
+```yaml
+steps:
+  - action: xml
+    id: xml-parse
+    name: Parse xml files
+    input:
+      commonParams:
+        encoding: raw
+      sources:
+        - content: <books><book>nature calls</book></books>
 
 ```
