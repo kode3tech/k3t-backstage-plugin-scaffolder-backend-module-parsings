@@ -1,82 +1,55 @@
-
-jest.mock('@backstage/plugin-scaffolder-node', () => {
-  const actual = jest.requireActual('@backstage/plugin-scaffolder-node');
+jest.mock("@backstage/plugin-scaffolder-node", () => {
+  const actual = jest.requireActual("@backstage/plugin-scaffolder-node");
   return { ...actual, fetchFile: jest.fn() };
 });
 
-import os from 'os';
-import { resolve as resolvePath } from 'path';
-import { getVoidLogger } from '@backstage/backend-common';
-import { ConfigReader } from '@backstage/config';
-import { ScmIntegrations } from '@backstage/integration';
-import { ActionContext, fetchFile } from '@backstage/plugin-scaffolder-node';
-import { createJsonParseAction } from './json';
-import { PassThrough } from 'stream';
-import { JSON_ID } from './ids';
-import { UrlReaderService } from '@backstage/backend-plugin-api';
+import { JSON_ID } from "./ids";
+import { createMockActionContext } from "@backstage/plugin-scaffolder-node-test-utils";
+import { createJsonPathAction, InputType, OutputType } from "./json-path";
 
 describe(`${JSON_ID}`, () => {
-  const integrations = ScmIntegrations.fromConfig(
-    new ConfigReader({
-      integrations: {
-        github: [{ host: 'github.com', token: 'token' }],
-      },
-    }),
-  );
-  const reader: UrlReaderService = {
-    readUrl: jest.fn(),
-    readTree: jest.fn(),
-    search: jest.fn(),
-  };
-
   beforeEach(() => {
     jest.resetAllMocks();
   });
 
-  const action = createJsonParseAction({ integrations, reader });
-  const mockContext: ActionContext<any, any> = {
-    input: {},
-    checkpoint: jest.fn(),
-    getInitiatorCredentials: jest.fn(),
-    workspacePath: os.tmpdir(),
-    logger: getVoidLogger(),
-    logStream: new PassThrough(),
-    output: jest.fn(),
-    createTemporaryDirectory: jest.fn(),
-  };
+  const action = createJsonPathAction();
 
-  it('should disallow a target path outside working directory', async () => {
-    await expect(
-      action.handler({
-        ...mockContext,
-        input: {
-          sources: [{
-            content: 'https://github.com/backstage/community/tree/main/backstage-community-sessions/assets/Backstage%20Community%20Sessions.png',
-            encoding: 'url',
-          }]
-        },
-      }),
-    ).rejects.toThrow(
-      /Relative path is not allowed to refer to a directory outside its parent/,
-    );
-  });
-
-  it('should fetch plain', async () => {
-    await action.handler({
-      ...mockContext,
+  it("should read from plain object", async () => {
+    const context = createMockActionContext<InputType, OutputType>({
       input: {
-        sources: [{
-          content: 'https://github.com/backstage/community/tree/main/backstage-community-sessions/assets/Backstage%20Community%20Sessions.png',
-          encoding: 'url',
-        }]
-    },
+        queries: [
+          {
+            path: "user.name",
+            json: {
+              user: {
+                id: 1,
+                name: "test",
+              },
+            },
+            options: {
+              flatten: true,
+            },
+          },
+          {
+            path: "user.id",
+            json: {
+              user: {
+                id: 1,
+                name: "test",
+              },
+            },
+            options: {
+              flatten: false,
+            },
+          },
+        ],
+      },
     });
-    expect(fetchFile).toHaveBeenCalledWith(
-      expect.objectContaining({
-        outputPath: resolvePath(mockContext.workspacePath, 'lol'),
-        fetchUrl:
-          'https://github.com/backstage/community/tree/main/backstage-community-sessions/assets/Backstage%20Community%20Sessions.png',
-      }),
+    await action.handler(context);
+
+    await expect(context.output).toHaveBeenCalledWith(
+      "results",
+      expect.arrayContaining([["test"], [1]])
     );
   });
 });
