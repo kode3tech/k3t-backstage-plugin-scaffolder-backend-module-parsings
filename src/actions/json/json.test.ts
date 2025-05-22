@@ -9,7 +9,7 @@ import { ConfigReader } from "@backstage/config";
 import { ScmIntegrations } from "@backstage/integration";
 import { fetchFile } from "@backstage/plugin-scaffolder-node";
 import { createMockActionContext } from "@backstage/plugin-scaffolder-node-test-utils";
-import { createJsonParseAction, InputType, OutputType } from "./json";
+import { createJsonParseAction } from "./json";
 
 import { JSON_ID } from "./ids";
 import { UrlReaderService } from "@backstage/backend-plugin-api";
@@ -37,13 +37,13 @@ describe(`${JSON_ID}`, () => {
   const action = createJsonParseAction({ integrations, reader });
 
   it("should fetch plain", async () => {
-    const context = createMockActionContext<InputType, OutputType>({
+    const context = createMockActionContext({
       input: {
         sources: [
           {
             content:
               "https://github.com/backstage/community/tree/main/backstage-community-sessions/assets/Backstage%20Community%20Sessions.png",
-            encoding: "url",
+            encoding: "url" as const,
           },
         ],
       },

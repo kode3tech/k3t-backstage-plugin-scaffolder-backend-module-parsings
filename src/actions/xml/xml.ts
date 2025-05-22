@@ -4,9 +4,9 @@ import {
   createTemplateAction,
 } from "@backstage/plugin-scaffolder-node";
 import { JsonObject } from "@backstage/types";
-import { Schema } from "jsonschema";
+import { z } from "zod";
 import xmljs from "xml-js";
-import { ContentType, resolvers } from "../utils/content";
+import { AvailableTypes, ContentType, resolvers } from "../utils/content";
 import { XML_ID } from "./ids";
 import { examples } from "./xml.examples";
 import { UrlReaderService } from "@backstage/backend-plugin-api";
@@ -41,14 +41,13 @@ function pipesProcessor(pipes?: Array<keyof PipesFnMap>) {
   };
 }
 
-const pipeFnField = {
-  type: "array",
-  title: `Available pipes are '${Object.keys(pipesFn).join("', '")}'`,
-  items: {
-    type: "string",
-    enum: Object.keys(pipesFn),
-  },
-};
+const pipeFnField = z
+  .array(
+    z.enum(
+      Object.keys(pipesFn) as [keyof PipesFnMap, ...Array<keyof PipesFnMap>]
+    )
+  )
+  .describe(`Available pipes are '${Object.keys(pipesFn).join("', '")}'`);
 
 export type FieldsType = {
   content: string;
@@ -84,130 +83,129 @@ export type FieldsType = {
   };
 } & JsonObject;
 
-export const FieldsSchema: Schema = {
-  type: "object",
-  properties: {
-    content: { title: "XML source content", type: "string" },
-    encoding: {
-      description:
-        'Indicate if input "content" field has encoded in "base64", "file", "raw" or "url".',
-      type: "string",
-    },
-    options: {
-      title: "Options for Converting XML → JS object / JSON",
-      description:
-        "https://www.npmjs.com/package/xml-js#options-for-converting-xml-%E2%86%92-js-object--json ",
-      type: "object",
-      properties: {
-        pipes: {
-          type: "object",
-          title: "Ordered pipes to transform nodes values by type.",
-          properties: {
-            doctype: { ...pipeFnField },
-            instruction: { ...pipeFnField },
-            cdata: { ...pipeFnField },
-            comment: { ...pipeFnField },
-            text: { ...pipeFnField },
-            instructionName: { ...pipeFnField },
-            elementName: { ...pipeFnField },
-            attributeName: { ...pipeFnField },
-            attributeValue: { ...pipeFnField },
-            attributes: { ...pipeFnField },
-          },
-        },
-        compact: {
-          type: "boolean",
-          title: "Whether to produce detailed object or compact object.",
-        },
-        trim: {
-          type: "boolean",
-          title:
-            "Whether to trim whitespace characters that may exist before and after the text.",
-        },
-        nativeType: {
-          type: "boolean",
-          title:
-            'Whether to attempt converting text of numerals or of boolean values to native type. For example, "123" will be 123 and "true" will be true',
-        },
-        nativeTypeAttributes: {
-          type: "boolean",
-          title:
-            "Whether to attempt converting attributes of numerals or of boolean values to native type. See also nativeType above.",
-        },
-        addParent: {
-          type: "boolean",
-          title:
-            "Whether to add parent property in each element object that points to parent object.",
-        },
-        alwaysArray: {
-          type: "boolean",
-          title:
-            "Whether to always put sub element, even if it is one only, as an item inside an array.",
-          description:
-            "Will be a:[{b:[{}]}] rather than a:{b:{}} (applicable for compact output only). If the passed value is an array, only elements with names in the passed array are always made arrays.",
-        },
-        alwaysChildren: {
-          type: "boolean",
-          title:
-            "Whether to always generate elements property even when there are no actual sub elements.",
-          description:
-            'Will be {"elements":[{"type":"element","name":"a","elements":[]}]} rather than {"elements":[{"type":"element","name":"a"}]} (applicable for non-compact output).',
-        },
-        instructionHasAttributes: {
-          type: "boolean",
-          title:
-            'Whether to parse contents of Processing Instruction as attributes or not. <?go to="there"?> will be {"_instruction":{"go":{"_attributes":{"to":"there"}}}} rather than {"_instruction":{"go":"to="there""}}. See discussion.',
-        },
-        ignoreDeclaration: {
-          type: "boolean",
-          title:
-            "Whether to ignore parsing declaration property. That is, no declaration property will be generated.",
-        },
-        ignoreInstruction: {
-          type: "boolean",
-          title:
-            "Whether to ignore parsing processing instruction property. That is, no instruction property will be generated.",
-        },
-        ignoreAttributes: {
-          type: "boolean",
-          title:
-            "Whether to ignore parsing attributes of elements.That is, no attributes property will be generated.",
-        },
-        ignoreComment: {
-          type: "boolean",
-          title:
-            "Whether to ignore parsing comments of the elements. That is, no comment will be generated.",
-        },
-        ignoreCdata: {
-          type: "boolean",
-          title:
-            "Whether to ignore parsing CData of the elements. That is, no cdata will be generated.",
-        },
-        ignoreDoctype: {
-          type: "boolean",
-          title:
-            "Whether to ignore parsing Doctype of the elements. That is, no doctype will be generated.",
-        },
-        ignoreText: {
-          type: "boolean",
-          title:
-            "Whether to ignore parsing texts of the elements. That is, no text will be generated.",
-        },
-      },
-    },
-  },
-};
+export const FieldsSchema = z.object({
+  content: z.string().describe("XML source content"),
+  encoding: z
+    .enum(AvailableTypes)
+    .describe(
+      'Indicate if input "content" field has encoded in "base64", "file", "raw" or "url".'
+    ),
+  options: z
+    .object({
+      pipes: z
+        .object({
+          doctype: pipeFnField.optional(),
+          instruction: pipeFnField.optional(),
+          cdata: pipeFnField.optional(),
+          comment: pipeFnField.optional(),
+          text: pipeFnField.optional(),
+          instructionName: pipeFnField.optional(),
+          elementName: pipeFnField.optional(),
+          attributeName: pipeFnField.optional(),
+          attributeValue: pipeFnField.optional(),
+          attributes: pipeFnField.optional(),
+        })
+        .describe("Ordered pipes to transform nodes values by type.")
+        .optional(),
+      compact: z
+        .boolean()
+        .describe("Whether to produce detailed object or compact object.")
+        .optional(),
+      trim: z
+        .boolean()
+        .describe(
+          "Whether to trim whitespace characters that may exist before and after the text."
+        )
+        .optional(),
+      nativeType: z
+        .boolean()
+        .describe(
+          'Whether to attempt converting text of numerals or of boolean values to native type. For example, "123" will be 123 and "true" will be true'
+        )
+        .optional(),
+      nativeTypeAttributes: z
+        .boolean()
+        .describe(
+          "Whether to attempt converting attributes of numerals or of boolean values to native type. See also nativeType above."
+        )
+        .optional(),
+      addParent: z
+        .boolean()
+        .describe(
+          "Whether to add parent property in each element object that points to parent object."
+        )
+        .optional(),
+      alwaysArray: z
+        .boolean()
+        .describe(
+          "Whether to always put sub element, even if it is one only, as an item inside an array. Will be a:[{b:[{}]}] rather than a:{b:{}} (applicable for compact output only). If the passed value is an array, only elements with names in the passed array are always made arrays."
+        )
+        .optional(),
+      alwaysChildren: z
+        .boolean()
+        .describe(
+          'Whether to always generate elements property even when there are no actual sub elements. Will be {"elements":[{"type":"element","name":"a","elements":[]}]} rather than {"elements":[{"type":"element","name":"a"}]} (applicable for non-compact output).'
+        )
+        .optional(),
+      instructionHasAttributes: z
+        .boolean()
+        .describe(
+          'Whether to parse contents of Processing Instruction as attributes or not. <?go to="there"?> will be {"_instruction":{"go":{"_attributes":{"to":"there"}}}} rather than {"_instruction":{"go":"to="there""}}. See discussion.'
+        )
+        .optional(),
+      ignoreDeclaration: z
+        .boolean()
+        .describe(
+          "Whether to ignore parsing declaration property. That is, no declaration property will be generated."
+        )
+        .optional(),
+      ignoreInstruction: z
+        .boolean()
+        .describe(
+          "Whether to ignore parsing processing instruction property. That is, no instruction property will be generated."
+        )
+        .optional(),
+      ignoreAttributes: z
+        .boolean()
+        .describe(
+          "Whether to ignore parsing attributes of elements.That is, no attributes property will be generated."
+        )
+        .optional(),
+      ignoreComment: z
+        .boolean()
+        .describe(
+          "Whether to ignore parsing comments of the elements. That is, no comment will be generated."
+        )
+        .optional(),
+      ignoreCdata: z
+        .boolean()
+        .describe(
+          "Whether to ignore parsing CData of the elements. That is, no cdata will be generated."
+        )
+        .optional(),
+      ignoreDoctype: z
+        .boolean()
+        .describe(
+          "Whether to ignore parsing Doctype of the elements. That is, no doctype will be generated."
+        )
+        .optional(),
+      ignoreText: z
+        .boolean()
+        .describe(
+          "Whether to ignore parsing texts of the elements. That is, no text will be generated."
+        )
+        .optional(),
+    })
+    .describe(
+      "Options for Converting XML → JS object / JSON - https://www.npmjs.com/package/xml-js#options-for-converting-xml-%E2%86%92-js-object--json"
+    )
+    .optional(),
+});
 
-export const InputSchema: Schema = {
-  type: "object",
-  properties: {
-    commonParams: FieldsSchema,
-    sources: {
-      type: "array",
-      items: FieldsSchema,
-    },
-  },
-};
+export const InputSchema = z.object({
+  commonParams: FieldsSchema.optional(),
+  sources: z.array(FieldsSchema),
+});
 
 export type InputType = {
   commonParams?: Partial<FieldsType>;
@@ -220,14 +218,9 @@ export type OutputType = {
   results: Array<OutputFields>;
 };
 
-export const OutputSchema: Schema = {
-  type: "object",
-  properties: {
-    results: {
-      type: "array",
-    },
-  },
-};
+export const OutputSchema = z.object({
+  results: z.array(z.any()),
+});
 
 export function createXmlParseAction({
   reader,
@@ -236,14 +229,19 @@ export function createXmlParseAction({
   reader: UrlReaderService;
   integrations: ScmIntegrations;
 }) {
-  return createTemplateAction<InputType, OutputType>({
+  return createTemplateAction({
     id: XML_ID,
     description: "Parse xml to json See https://www.npmjs.com/package/xml-js ",
     examples,
     supportsDryRun: true,
     schema: {
-      input: InputSchema,
-      output: OutputSchema,
+      input: {
+        commonParams: (d) => d.object(FieldsSchema.shape).optional(),
+        sources: (d) => d.array(d.object(FieldsSchema.shape)),
+      },
+      output: {
+        results: (d) => d.array(d.any()),
+      },
     },
     async handler(ctx) {
       const {
@@ -255,7 +253,7 @@ export function createXmlParseAction({
 
       for (const source of sources) {
         const { content, encoding, options } = {
-          ...{ encoding: "base64" },
+          ...{ encoding: "base64" as ContentType },
           ...(commonParams ?? {}),
           ...source,
         };

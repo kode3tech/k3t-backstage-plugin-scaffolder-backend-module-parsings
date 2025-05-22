@@ -1,7 +1,7 @@
 import { createTemplateAction } from "@backstage/plugin-scaffolder-node";
 import { JsonObject } from "@backstage/types";
 import { JSONPath } from "jsonpath-plus";
-import { Schema } from "jsonschema";
+import { z } from "zod";
 import { JSON_PATH_ID } from "./ids";
 import { examples } from "./json-path.examples";
 
@@ -13,41 +13,22 @@ export type FieldsType = {
   };
 } & JsonObject;
 
-export const FieldsSchema: Schema = {
-  type: "object",
-  required: ["content"],
-  properties: {
-    json: {
-      title: "Input JSON object data",
-      type: "object",
-    },
-    path: {
-      type: "string",
-      title: "JSON Path query",
-    },
-    options: {
-      type: "object",
-      title: "List of queries",
-      properties: {
-        flatten: {
-          type: "boolean",
-          title: "(default: false) Flatten nestes results arrays",
-        },
-      },
-    },
-  },
-};
+export const FieldsSchema = z.object({
+  json: z.any().describe("Input JSON object data"),
+  path: z.string().describe("JSON Path query"),
+  options: z
+    .object({
+      flatten: z
+        .boolean()
+        .describe("(default: false) Flatten nested results arrays"),
+    })
+    .describe("List of queries"),
+});
 
-export const InputSchema: Schema = {
-  type: "object",
-  properties: {
-    commonParams: FieldsSchema,
-    queries: {
-      type: "array",
-      items: FieldsSchema,
-    },
-  },
-};
+export const InputSchema = z.object({
+  commonParams: FieldsSchema.optional(),
+  queries: z.array(FieldsSchema),
+});
 
 export type InputType = {
   commonParams?: Partial<FieldsType>;
@@ -60,27 +41,24 @@ export type OutputType = {
   results: OutputFields;
 };
 
-export const OutputSchema: Schema = {
-  type: "object",
-  properties: {
-    results: {
-      type: "array",
-      items: {
-        type: "object",
-      },
-    },
-  },
-};
+export const OutputSchema = z.object({
+  results: z.array(z.object({})),
+});
 
 export function createJsonPathAction() {
-  return createTemplateAction<InputType, OutputType>({
+  return createTemplateAction({
     id: JSON_PATH_ID,
     description: "Get value from json with jsonpath-plus",
     examples,
     supportsDryRun: true,
     schema: {
-      input: InputSchema,
-      output: OutputSchema,
+      input: {
+        commonParams: (d) => d.object(FieldsSchema.shape).optional(),
+        queries: (d) => d.array(d.object(FieldsSchema.shape)),
+      },
+      output: {
+        results: (d) => d.array(d.object({})),
+      },
     },
     async handler(ctx) {
       const {
