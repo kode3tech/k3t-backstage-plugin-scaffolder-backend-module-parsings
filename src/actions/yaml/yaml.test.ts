@@ -8,7 +8,7 @@ import { resolve as resolvePath } from "path";
 import { ConfigReader } from "@backstage/config";
 import { ScmIntegrations } from "@backstage/integration";
 import { fetchFile } from "@backstage/plugin-scaffolder-node";
-import { createYamlParseAction, InputType, OutputType } from "./yaml";
+import { createYamlParseAction } from "./yaml";
 
 import { YAML_ID } from "./ids";
 import { UrlReaderService } from "@backstage/backend-plugin-api";
@@ -35,13 +35,13 @@ describe(`${YAML_ID}`, () => {
   const action = createYamlParseAction({ integrations, reader });
 
   it("should fetch plain", async () => {
-    const context = createMockActionContext<InputType, OutputType>({
+    const context = createMockActionContext({
       input: {
         sources: [
           {
             content:
               "https://github.com/backstage/community/tree/main/backstage-community-sessions/assets/Backstage%20Community%20Sessions.png",
-            encoding: "url",
+            encoding: "url" as const,
           },
         ],
       },

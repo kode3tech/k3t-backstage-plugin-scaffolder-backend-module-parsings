@@ -5,7 +5,7 @@ jest.mock("@backstage/plugin-scaffolder-node", () => {
 
 import { JSON_ID } from "./ids";
 import { createMockActionContext } from "@backstage/plugin-scaffolder-node-test-utils";
-import { createJsonPathAction, InputType, OutputType } from "./json-path";
+import { createJsonPathAction } from "./json-path";
 
 describe(`${JSON_ID}`, () => {
   beforeEach(() => {
@@ -15,7 +15,7 @@ describe(`${JSON_ID}`, () => {
   const action = createJsonPathAction();
 
   it("should read from plain object", async () => {
-    const context = createMockActionContext<InputType, OutputType>({
+    const context = createMockActionContext({
       input: {
         queries: [
           {

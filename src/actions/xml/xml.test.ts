@@ -7,7 +7,7 @@ import { resolve as resolvePath } from "path";
 import { ConfigReader } from "@backstage/config";
 import { ScmIntegrations } from "@backstage/integration";
 import { fetchFile } from "@backstage/plugin-scaffolder-node";
-import { createXmlParseAction, InputType, OutputType } from "./xml";
+import { createXmlParseAction } from "./xml";
 import { XML_ID } from "./ids";
 import { UrlReaderService } from "@backstage/backend-plugin-api";
 import { createMockActionContext } from "@backstage/plugin-scaffolder-node-test-utils";
@@ -33,13 +33,13 @@ describe(`${XML_ID}`, () => {
   const action = createXmlParseAction({ integrations, reader });
 
   it("should fetch plain", async () => {
-    const context = createMockActionContext<InputType, OutputType>({
+    const context = createMockActionContext({
       input: {
         sources: [
           {
             content:
               "https://github.com/backstage/community/tree/main/backstage-community-sessions/assets/Backstage%20Community%20Sessions.png",
-            encoding: "url",
+            encoding: "url" as const,
           },
         ],
       },

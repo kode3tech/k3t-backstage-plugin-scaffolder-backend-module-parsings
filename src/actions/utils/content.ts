@@ -6,7 +6,7 @@ import { resolve as resolvePath } from "node:path";
 
 export type ContentType = "base64" | "file" | "raw" | "url";
 
-export const AvailableTypes = ["base64", "file", "raw", "url"];
+export const AvailableTypes = ["base64", "file", "raw", "url"] as const;
 
 type fnContentResolver = (
   content: string,

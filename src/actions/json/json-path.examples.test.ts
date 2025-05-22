@@ -8,7 +8,6 @@ import { JSON_PATH_ID } from "./ids";
 import { createJsonPathAction } from "./json-path";
 import { examples } from "./json-path.examples";
 import { createMockActionContext } from "@backstage/plugin-scaffolder-node-test-utils";
-import { InputType, OutputType } from "./json-path";
 
 describe(`${JSON_PATH_ID} examples`, () => {
   beforeEach(() => {
@@ -18,7 +17,7 @@ describe(`${JSON_PATH_ID} examples`, () => {
   const action = createJsonPathAction();
 
   it("should parse object", async () => {
-    const context = createMockActionContext<InputType, OutputType>({
+    const context = createMockActionContext({
       input: yaml.parse(examples[0].example).steps[0].input,
     });
 

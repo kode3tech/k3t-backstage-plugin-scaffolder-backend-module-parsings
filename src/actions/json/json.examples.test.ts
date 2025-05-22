@@ -6,7 +6,7 @@ jest.mock("@backstage/plugin-scaffolder-node", () => {
 import yaml from "yaml";
 import { ConfigReader } from "@backstage/config";
 import { ScmIntegrations } from "@backstage/integration";
-import { createJsonParseAction, InputType, OutputType } from "./json";
+import { createJsonParseAction } from "./json";
 import { examples } from "./json.examples";
 import { UrlReaderService } from "@backstage/backend-plugin-api";
 import { createMockActionContext } from "@backstage/plugin-scaffolder-node-test-utils";
@@ -32,7 +32,7 @@ describe("json:parse examples", () => {
   const action = createJsonParseAction({ integrations, reader });
 
   it("should parse object", async () => {
-    const context = createMockActionContext<InputType, OutputType>({
+    const context = createMockActionContext({
       input: yaml.parse(examples[0].example).steps[0].input,
     });
     await action.handler(context);

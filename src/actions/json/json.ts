@@ -4,43 +4,26 @@ import {
   createTemplateAction,
 } from "@backstage/plugin-scaffolder-node";
 import { JsonObject } from "@backstage/types";
-import { Schema } from "jsonschema";
 import { AvailableTypes, ContentType, resolvers } from "../utils/content";
 import { JSON_ID } from "./ids";
 import { examples } from "./json.examples";
 import { UrlReaderService } from "@backstage/backend-plugin-api";
+import { z } from "zod";
 
 export type FieldsType = {
   content: string;
   encoding: ContentType;
 } & JsonObject;
 
-export const FieldsSchema: Schema = {
-  type: "object",
-  required: ["content"],
-  properties: {
-    content: {
-      description: "JSON source content",
-      type: "string",
-    },
-    encoding: {
-      description:
-        'Indicate if input "content" field has encoded in "base64", "file", "raw" or "url".',
-      type: "string",
-      enum: AvailableTypes,
-    },
-  },
-};
-
-export const InputSchema: Schema = {
-  type: "object",
-  properties: {
-    commonParams: FieldsSchema,
-    sources: {
-      type: "array",
-      items: FieldsSchema,
-    },
-  },
+// Using Zod schema approach
+export const FieldsSchema = {
+  content: z.string().describe("JSON source content"),
+  encoding: z
+    .enum(AvailableTypes)
+    .describe(
+      'Indicate if input "content" field has encoded in "base64", "file", "raw" or "url".'
+    )
+    .optional(),
 };
 
 export type InputType = {
@@ -54,17 +37,8 @@ export type OutputType = {
   results: OutputFields;
 };
 
-export const OutputSchema: Schema = {
-  type: "object",
-  properties: {
-    results: {
-      type: "array",
-      items: {
-        type: "object",
-      },
-    },
-  },
-};
+// Using Zod schema approach
+export const OutputSchema = {};
 
 /**
  * Downloads content and places it in the workspace, or optionally
@@ -78,13 +52,18 @@ export function createJsonParseAction({
   reader: UrlReaderService;
   integrations: ScmIntegrations;
 }) {
-  return createTemplateAction<InputType, OutputType>({
+  return createTemplateAction({
     id: JSON_ID,
     description: "Parse JSON contents from diferent sources types.",
     examples,
     schema: {
-      input: InputSchema,
-      output: OutputSchema,
+      input: {
+        commonParams: (d) => d.object(FieldsSchema).optional(),
+        sources: (d) => d.array(d.object(FieldsSchema)),
+      },
+      output: {
+        results: (d) => d.array(d.object({})),
+      },
     },
     supportsDryRun: true,
     async handler(ctx) {
@@ -97,13 +76,13 @@ export function createJsonParseAction({
 
       for (const source of sources) {
         const { content, encoding } = {
-          ...{ encoding: "base64" },
+          ...{ encoding: "base64" as ContentType },
           ...(commonParams ?? {}),
           ...source,
         };
 
         try {
-          const finalContent = await resolvers[encoding](
+          const finalContent = await resolvers[encoding as ContentType](
             content,
             ctx as ActionContext<any, any>,
             { reader, integrations }

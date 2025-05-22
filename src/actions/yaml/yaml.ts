@@ -5,7 +5,7 @@ import {
 import { loadAll } from "js-yaml";
 import { AvailableTypes, ContentType, resolvers } from "../utils/content";
 import { JsonObject } from "@backstage/types";
-import { Schema } from "jsonschema";
+import { z } from "zod";
 import { ScmIntegrations } from "@backstage/integration";
 import { YAML_ID } from "./ids";
 import { examples } from "./yaml.examples";
@@ -16,33 +16,19 @@ export type FieldsType = {
   encoding: ContentType;
 } & JsonObject;
 
-export const FieldsSchema: Schema = {
-  type: "object",
-  required: ["content"],
-  properties: {
-    content: {
-      description: "YAML source content",
-      type: "string",
-    },
-    encoding: {
-      description:
-        'Indicate if input "content" field has encoded in "base64", "file", "raw" or "url".',
-      type: "string",
-      enum: AvailableTypes,
-    },
-  },
-};
+export const FieldsSchema = z.object({
+  content: z.string().describe("YAML source content"),
+  encoding: z
+    .enum(AvailableTypes)
+    .describe(
+      'Indicate if input "content" field has encoded in "base64", "file", "raw" or "url".'
+    ),
+});
 
-export const InputSchema: Schema = {
-  type: "object",
-  properties: {
-    commonParams: FieldsSchema,
-    sources: {
-      type: "array",
-      items: FieldsSchema,
-    },
-  },
-};
+export const InputSchema = z.object({
+  commonParams: FieldsSchema.optional(),
+  sources: z.array(FieldsSchema),
+});
 
 export type InputType = {
   commonParams?: Partial<FieldsType>;
@@ -55,17 +41,9 @@ export type OutputType = {
   results: Array<OutputFields>;
 };
 
-export const OutputSchema: Schema = {
-  type: "object",
-  properties: {
-    results: {
-      type: "array",
-      items: {
-        type: "array",
-      },
-    },
-  },
-};
+export const OutputSchema = z.object({
+  results: z.array(z.array(z.any())),
+});
 
 export function createYamlParseAction({
   reader,
@@ -74,14 +52,19 @@ export function createYamlParseAction({
   reader: UrlReaderService;
   integrations: ScmIntegrations;
 }) {
-  return createTemplateAction<InputType, OutputType>({
+  return createTemplateAction({
     id: YAML_ID,
     description: "Parse YAML contents from diferent sources types. ",
     examples,
     supportsDryRun: true,
     schema: {
-      input: InputSchema,
-      output: OutputSchema,
+      input: {
+        commonParams: (d) => d.object(FieldsSchema.shape).optional(),
+        sources: (d) => d.array(d.object(FieldsSchema.shape)),
+      },
+      output: {
+        results: (d) => d.array(d.array(d.any())),
+      },
     },
     async handler(ctx) {
       const {
@@ -93,7 +76,7 @@ export function createYamlParseAction({
 
       for (const source of sources) {
         const { content, encoding } = {
-          ...{ encoding: "base64" },
+          ...{ encoding: "base64" as ContentType },
           ...(commonParams ?? {}),
           ...source,
         };
